@@ -6,6 +6,9 @@ const age = document.querySelector("#age");
 const url = "http://localhost:3000/users";
 
 const registerUser = async () => {
+  if (userName.value === "" && email.value === "" && age.value === "") {
+    return;
+  }
   app.innerHTML = "";
   const user = userName.value;
   const mail = email.value;
