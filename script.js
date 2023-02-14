@@ -9,7 +9,7 @@ const registerUser = async () => {
   if (userName.value === "" && email.value === "" && age.value === "") {
     return;
   }
-  app.innerHTML = "";
+
   const user = userName.value;
   const mail = email.value;
   const ag = age.value;
@@ -22,14 +22,26 @@ const registerUser = async () => {
   email.value = "";
   age.value = "";
   const data = await resData.json();
+  app.innerHTML = "";
   updateUI(data);
 };
 
-const updateUser = (event) => {
-  console.log(event.target.id);
+const updateUser = async (event) => {
+  const name = document.querySelector(".updateName").value;
+  const email = document.querySelector(".updateEmail").value;
+  const age = document.querySelector(".updateAge").value;
+  const updateInfo = { name, email, age };
+  const response = await fetch(url, {
+    method: "PUT",
+    body: JSON.stringify(updateInfo),
+  });
+  const data = await response.json();
+  app.innerHTML = "";
+  updateUI(data);
 };
 
 const deleteUser = async (event) => {
+  app.innerHTML = "";
   const deleteUserId = event.target.id;
   console.log(deleteUserId);
   const deleteToUser = { email: deleteUserId };
@@ -39,6 +51,7 @@ const deleteUser = async (event) => {
     body: JSON.stringify(deleteToUser),
   });
   const data = await response.json();
+  console.log(data);
   updateUI(data);
 };
 
@@ -52,7 +65,15 @@ const updateUI = (userInfo) => {
         <div class="btn-container">
             <div class="user-name">${user.name}</div>
             <div class="btn-box">
-                <button type="button" class="btn btn-success" id="${user.email}" onclick="updateUser(event)">CreateUser</button>
+                <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+        data-bs-whatever="@mdo"
+      >
+        Open modal for @mdo
+      </button>
                 <button type="button" class="btn btn-danger" id="${user.email}" onclick="deleteUser(event)">DeleteUser</button>
             </div>
         </div>

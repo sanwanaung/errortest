@@ -1,7 +1,7 @@
 const http = require("http");
 const fs = require("fs");
 const port = 3000;
-const users = [
+let users = [
   { name: "san wan aung", email: "sanwanaung400042@gmail.com", age: 20 },
   { name: "zaw mun aung", email: "zawmunaung089@gmail.com", age: 26 },
   { name: "kyaw kyaw", email: "kyawkyaw@gmail.com", age: 30 },
@@ -35,6 +35,7 @@ const server = http.createServer((req, res) => {
     if (method === "GET") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.write(JSON.stringify(users));
+      res.end();
     } else if (method === "POST") {
       let newData = "";
       req.on("data", (chunk) => {
@@ -44,9 +45,10 @@ const server = http.createServer((req, res) => {
         const changeObj = JSON.parse(newData);
         console.log(changeObj);
         users.push(changeObj);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify(users));
+        res.end();
       });
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.write(JSON.stringify(users));
     } else if (method === "DELETE") {
       let dataFromScript = "";
       let filterEmail;
@@ -61,11 +63,30 @@ const server = http.createServer((req, res) => {
         filterEmail = users.filter((elem) => {
           return elem.email !== deleteUserId;
         });
+        users = filterEmail;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify(users));
+        res.end();
       });
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.write(JSON.stringify(filterEmail));
+    } else if (method === "PUT") {
+      let newData = "";
+
+      req.on("data", (chunk) => {
+        newData += chunk;
+      });
+      req.on("end", () => {
+        const chagneObj = JSON.parse(newData);
+        const changeUserEmail = chagneObj.email;
+        const user = users.find((elem) => elem.email === changeUserEmail);
+        if (user) {
+          user.name = chagneObj.name;
+          user.age = chagneObj.age;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify(users));
+        res.end();
+      });
     }
-    res.end();
   } else {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.write("Not Home Url");
